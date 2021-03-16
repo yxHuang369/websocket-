@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>websocket</title>
+</head>
+
+<body>
+    <input type="text" placeholder="输入你的内容" />
+    <!-- 发送请求 -->
+    <button>发送请求</button>
+    <!-- 显示结果 -->
+    <div></div>
+    <script>
+        const TYPE_ENTER = 0
+        const TYPE_LEAVE = 1
+        const TYPE_MSG = 2
+        // 演示websocket在浏览器如何使用
+        var input = document.querySelector('input')
+        // ws已经直接提供了websocker的api ws://echo.websocket.org
+        var button = document.querySelector('button')
+        var div = document.querySelector('div')
+
+        // 1.创建websocket
+        // 参数1：websocket的服务地址
+        var socket = new WebSocket('ws://localhost:3000')
+        // 2.open：当和websocket服务连接成功时候触发
+        socket.addEventListener('open', function () {
+            div.innerHTML = "连接成功"
+        })
+        // 3.主动给websocket服务发送消息
+        button.addEventListener('click', function () {
+            var value = input.value
+            socket.send(value)
+            input.value = ""
+        })
+        // 4.接受websocket服务器的数据
+        socket.addEventListener('message', function (e) {
+            let d = new Date()
+            let f = d.toLocaleTimeString()
+            // console.log(, "kkkk")
+            let times = new Date().toLocaleTimeString()
+            var data = JSON.parse(e.data)
+            console.log(data)
+            var dv = document.createElement('div')
+            let userName = data.userName == undefined ? '' : data.userName
+            dv.innerText = userName + data.msg + '-----' + times
+            if (data.type === TYPE_ENTER) {
+                dv.style.color = 'green'
+            } else if (data.type === TYPE_LEAVE) {
+                dv.style.color = 'red'
+            } else {
+                dv.style.color = 'blue'
+            }
+            div.appendChild(dv)
+        })
+        socket.addEventListener('close', function () {
+            div.innerHTML = "服务断开连接"
+        })
+    </script>
+</body>
+
+</html>
